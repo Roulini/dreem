@@ -6,13 +6,15 @@ from sklearn.model_selection import train_test_split
 import joblib
 
 def save_data(model,scaler,x,y):
-    joblib.dump(model,"models/model1.save")
-    joblib.dump(x,"models/x_train1")
-    joblib.dump(y,"models/y_train1")
-    joblib.dump(scaler,"models/scaler1")
+    i=2
+    joblib.dump(model,"models/model"+str(i)+".save")
+    joblib.dump(x,"models/x_train"+str(i)+".save")
+    joblib.dump(y,"models/y_train"+str(i)+".save")
+    joblib.dump(scaler,"models/scaler"+str(i)+".save")
     
 
 def train_model_and_score(X,y_train):
+    """train model for test"""
     scaler = MinMaxScaler()
     X_scaled = scaler.fit_transform(X)
 
@@ -33,6 +35,7 @@ def train_model_and_score(X,y_train):
     return model,sc
 
 def train_full_model(X,y_train):
+    """train model with all the training models for kaggle submission"""
     scaler = MinMaxScaler()
     x_train = scaler.fit_transform(X)
 

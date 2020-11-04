@@ -37,7 +37,7 @@ def get_mid_freq(freq_seq):
     for i in range(len(freq_seq)):
         cum_sum = cum_sum + np.abs(freq_seq[i])
         if cum_sum>=integral/2:
-            print(cum_sum,integral)
+            # print(cum_sum,integral)
             return i
 
 def get_amplitude_range_freq(freq_seq,fmin,fmax):
@@ -49,7 +49,7 @@ def get_amplitude_range_freq(freq_seq,fmin,fmax):
 
 def esis(data_array):
     """retur sum of amplitude of the signal"""
-    return np.sum(np.abs(data_array))
+    return np.sum(np.square(np.abs(data_array)))
 
 def esis_epoch(data_epoch):
     """return sum of amplitude of the signal for an epoch"""
@@ -59,28 +59,27 @@ def esis_epoch(data_epoch):
 
 def get_features(data,n=None):
     """extract de features from the data""" 
+    n_eeg = 2
     
     if n !=None: #take only part of the data
         data_cut = {}
         for key in data.keys():
             data_cut[key] = data[key][:n]
         data = data_cut
-    features_array=[]
-    for i in range(1,4) : features_array.append([MMD_epoch(eeg_epoch) for eeg_epoch in data['eeg_' +str(i)][:]])
-    features_array.append([MMD_epoch(pos_epoch) for pos_epoch in data['x'][:]])
-    features_array.append([MMD_epoch(pos_epoch) for pos_epoch in data['y'][:]])
-    features_array.append([MMD_epoch(pos_epoch) for pos_epoch in data['z'][:]])
-    features_array.append([MMD_epoch(pos_epoch) for pos_epoch in data['pulse'][:]])
+    feature_dic={}
+    for i in range(1,n_eeg+1) : feature_dic['eeg_' +str(i)+"MMD"] = [MMD_epoch(eeg_epoch) for eeg_epoch in data['eeg_' +str(i)][:]]
+    feature_dic["xMMD"] = [MMD_epoch(pos_epoch) for pos_epoch in data['x'][:]]
+    feature_dic["yMMD"] = [MMD_epoch(pos_epoch) for pos_epoch in data['y'][:]]
+    feature_dic["zMMD"] = [MMD_epoch(pos_epoch) for pos_epoch in data['z'][:]]
+    feature_dic["pulseMMD"] = [MMD_epoch(pos_epoch) for pos_epoch in data['pulse'][:]]
 
-    for i in range(1,4) : features_array.append([esis_epoch(eeg_epoch) for eeg_epoch in data['eeg_'+str(i)][:]]) 
-    features_array.append([esis_epoch(pos_epoch) for pos_epoch in data['x'][:]])
-    features_array.append([esis_epoch(pos_epoch) for pos_epoch in data['y'][:]])
-    features_array.append([esis_epoch(pos_epoch) for pos_epoch in data['z'][:]])
-    features_array.append([esis_epoch(pos_epoch) for pos_epoch in data['pulse'][:]])
+    for i in range(1,n_eeg+1) : feature_dic["eeg_"+str(i)+"esis"] = [esis_epoch(eeg_epoch) for eeg_epoch in data['eeg_'+str(i)][:]]
+    feature_dic["xesis"] = [esis_epoch(pos_epoch) for pos_epoch in data['x'][:]]
+    feature_dic["yesis"] = [esis_epoch(pos_epoch) for pos_epoch in data['y'][:]]
+    feature_dic["zesis"] = [esis_epoch(pos_epoch) for pos_epoch in data['z'][:]]
+    feature_dic["pulseesis"] = [esis_epoch(pos_epoch) for pos_epoch in data['pulse'][:]]
 
-    for i in range(1,4): features_array.append([get_mid_freq(eeg_epoch) for eeg_epoch in data['eeg_'+str(i)][:]]) 
-
-    features_array=[]
-
+    for i in range(1,n_eeg+1): feature_dic["eeg_"+str(i)+"midfreq"] = [get_mid_freq(eeg_epoch) for eeg_epoch in data['eeg_'+str(i)][:]]
     
-    return pd.DataFrame(features_array).T
+    
+    return pd.DataFrame(feature_dic)
