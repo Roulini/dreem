@@ -4,9 +4,11 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 import joblib
+from sklearn.ensemble import GradientBoostingClassifier
+import time
 
 def save_data(model,scaler,x,y):
-    i=2
+    i=5
     joblib.dump(model,"models/model"+str(i)+".save")
     joblib.dump(x,"models/x_train"+str(i)+".save")
     joblib.dump(y,"models/y_train"+str(i)+".save")
@@ -19,7 +21,8 @@ def train_model_and_score(X,y_train):
     X_scaled = scaler.fit_transform(X)
 
     #chose model
-    model = RandomForestClassifier()
+    # model = RandomForestClassifier()
+    model = GradientBoostingClassifier()
 
     #split train/test
     x_train,x_test,y_train,y_test = train_test_split(X_scaled,y_train,test_size=0.33,random_state =42)
@@ -40,10 +43,16 @@ def train_full_model(X,y_train):
     x_train = scaler.fit_transform(X)
 
     #chose model
-    model = RandomForestClassifier()
+    # model = RandomForestClassifier()
+    model = GradientBoostingClassifier()
+
 
     #train
+    print("train model")
+    tic = time.time()
     model.fit(x_train,y_train)
+    tac = time.time()
+    print("elapsed time", tac-tic)
 
     #save data
     save_data(model,scaler,x_train,y_train)
